@@ -1,0 +1,770 @@
+<html>
+<head>
+  <title>Natural Heritage Bureau: Data Mapper</title>
+  <!-- leaflet -->
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <!-- jquery-->
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/jquery-2.1.1.min.js"></script>
+  <!-- leaflet search -->
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/leaflet-search.js"></script>
+  <link rel="stylesheet" href="https://rawgit.com/derekserach/NHBDataMapper/master/css/leaflet-search.css">
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+  <!-- leaflet label -->
+  <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+  <!-- leaflet draw -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+  <!-- leaflet geosearch -->
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/l.control.geosearch.js"></script>
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/l.geosearch.provider.esri.js"></script>
+  <link rel="stylesheet" href="https://rawgit.com/derekserach/NHBDataMapper/master/css/l.geosearch.css" />
+  <!-- leaflet mouse controls -->
+  <link rel='stylesheet' href="https://rawgit.com/derekserach/NHBDataMapper/master/css/L.Control.MousePosition.css"/>
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/L.Control.MousePosition.js"></script>
+  <!--leaflet sidebar -->
+  <link rel='stylesheet' href="https://rawgit.com/derekserach/NHBDataMapper/master/css/leaflet-sidebar.css">
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/leaflet-sidebar.js"></script>
+  <!-- leaflet easy button -->
+  <link rel='stylesheet' href="https://rawgit.com/derekserach/NHBDataMapper/master/css/easy-button.css">
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/easy-button.js"></script>
+  <!--turf -->
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/turf.min.js"></script>
+  <!--bootstrap dialog -->
+  <link rel='stylesheet' href="https://rawgit.com/derekserach/NHBDataMapper/master/css/bootstrap-dialog.css">
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/bootstrap-dialog.js"></script>
+  <!-- awesome markers -->
+  <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+  <link rel="stylesheet" href="https://rawgit.com/derekserach/NHBDataMapper/master/dist/leaflet.awesome-markers.css">
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/dist/leaflet.awesome-markers.js"></script>
+  <!-- leaflet messagebox -->
+  <link rel='stylesheet' href="https://rawgit.com/derekserach/NHBDataMapper/master/css/leaflet-messagebox.css">
+  <script src="https://rawgit.com/derekserach/NHBDataMapper/master/js/leaflet-messagebox.js"></script>
+  <!-- js spin -->
+  <script src="http://spin.js.org/spin.js"></script>
+  <script src="https://rawgit.com/makinacorpus/Leaflet.Spin/master/leaflet.spin.js"></script>
+  <style>
+    #map{ height: 100% }
+    .myDropDown
+{
+   height: 100px;
+   overflow: auto;
+}
+#delete, #export {
+            position: absolute;
+            top:90px;
+            right:10px;
+            z-index:100;
+            background:white;
+            color:black;
+            padding:6px;
+            border-radius:4px;
+            font-family: 'Helvetica Neue';
+            cursor: pointer;
+            font-size:12px;
+            text-decoration:none;
+            border-style: solid;
+        }
+        #export {
+            top:140px;
+        }
+        #reset {
+            position: absolute;
+            top:50px;
+            right:10px;
+            z-index:100;
+            background:white;
+            color:black;
+            padding:6px;
+            border-radius:4px;
+            font-family: 'Helvetica Neue';
+            cursor: pointer;
+            font-size:12px;
+            text-decoration:none;
+            border-style: solid;
+        }
+        #reset {
+        	top:170px;
+        }
+        
+       	.my-label {
+		width: 110%;
+		text-align: center;
+  		height: 100%;
+		font-weight:bold;
+		cursor: default;
+		color:rgb(0,0,0);
+    		background-color: rgb(255, 255, 255);
+  		-moz-border-radius: 15px;
+  		-webkit-border-radius: 15px;
+  		border: 2px solid #000000;
+  		padding: 1px;
+	}
+  hr.fancy {
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+	div.ridge {border-style: ridge;}
+  </style>
+</head>
+<body>
+  <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+                <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
+                <li><a href="mailto:LandownerRequestNHB@dred.nh.gov?subject=Landowner Request" role="tab"><i class="fa fa-envelope"></i></a></li>
+                <li><a href="http://www.nhdfl.org/about-forests-and-lands/bureaus/natural-heritage-bureau/" role="tab" target="_blank"><i class="fa fa-leaf"></i></a></li>
+            </ul>
+
+        </div>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content">
+            <div class="sidebar-pane" id="home">
+                <h1 class="sidebar-header" style="background-color: #006400;font-family: 'Lucinda Console'">
+                    NH Forests & Lands Mapping
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+                <div class="container-fluid">
+                  <div class="row" style="font-family:'Copperplate'">
+
+                      <div class="col-sm-5"><br><a data-flickr-embed="true"  href="#" title="NHB logo (curved name colored)"><img src="https://c4.staticflickr.com/6/5329/31376282195_76367808fa_m.jpg" class="img-responsive img-rounded" width="130" height="130" alt="NHB logo (curved name colored)"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+                      </div>
+                      <div class="col-sm-7"><h3 class="text-success"><center><strong>Natural Heritage Bureau</strong></center></h3><hr class="fancy">
+                        <h3 class="text-info"><center><strong>Data Mapper</strong></center></h3>
+                      </div>
+                  </div>
+                </div>
+                
+                <div style="font-family:'Copperplate'">
+                <h3 class="text-info">Getting Oriented!</h3><h4 class="text-info">**Note: this application currently does not support use with Internet Explorer or Microsoft Edge and is better used with Google Chrome, Firefox etc.**</h4><h4><strong>Step 1.</strong> Use the Search Window Tool, found in the top left-hand corner of the map, begin typing in a New Hampshire town name. A list of towns will appear. Picking a town will place a target on it in the map.<br><br><strong>Step 2.</strong> Hover over a town on the map, each town will display its town name in a label alongside it. Click on the town to zoom to it.<br><br><strong>Step 3.</strong> Navigate to your project area by panning or zooming. You can zoom by either using the zoom tools found at the top-left of the map or using your mouse scroll wheel.</h4><h4>Change your basemap layer using the layers icon found at the top right-hand corner of the map.<br><br><strong>Step 4.</strong> Use the drawing tools found at the top left-hand corner of the map to draw a polygon for your project area. Follow the instructions that appear.</h4><h4>You can choose to delete or edit your features as well, using additional tools if needed.<br><br><strong>Step 5.</strong> When done drawing, click on the 'Proceed to Form' button. You will be directed through a series of form prompts where you can download a .csv entitled NHB_LandownerRequest. This file can be manually attached when sent to the <a href="mailto:LandownerRequestNHB@dred.nh.gov?subject=Landowner Request" role="tab"></i>Landowner Request E-mail</a>.</h4></div>
+                </div>
+            <div class="sidebar-pane" id="profile">
+                <h1 class="sidebar-header" style="background-color: #006400;font-family: 'Lucinda Console'">Application Profile<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+                <div style="font-family: 'Copperplate'">
+                <h4 class="text-muted"><br><li>The NH Natural Heritage Bureau (NHB) maintains data on known locations of rare species and exemplary natural communities. The NHB Data Mapper facilitates the creation of a csv file that can be used in submitting an official data request.</li><br><li>This application was developed in collaboration with Derek Serach, GIS Program Planner for NH Forests & Lands and the Natural Heritage Bureau.</li><br><li>The Forests & Lands Mapping template was established using open source products: <a href="http://leafletjs.com/">Leaflet</a> and available <a href="http://leafletjs.com/plugins.html">plug-ins</a>.</li></h4>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+  <div id="map" class="sidebar-map"></div>
+  <a href='#' id='export'><i class="fa fa-download" aria-hidden="true"></i> Proceed to Form</a>
+  <script>
+  var DrawBool = false;
+  // initialize the map
+
+  var map = L.map('map').setView([44,-72.5], 8);
+  var TopoMapTiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+  detectRetina: true
+  }).addTo(map);
+  var ImageryTiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+  detectRetina: true
+  });
+  var OpenStreetMap_Mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  detectRetina: true
+});
+var OpenTopoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+  detectRetina: true
+});
+
+  var BaseMaps = {
+  	'Esri Imagery': ImageryTiles,
+  	'Esri Topo': TopoMapTiles,
+  	'Open Topo': OpenTopoMap,
+  	'Open Street': OpenStreetMap_Mapnik
+  };
+
+  L.control.layers(BaseMaps, null, {collapsed:false}).addTo(map);
+
+  var Towns = new L.geoJson(null, {
+  	style: {
+      	fillColor: "#000000",
+      	fillOpacity: 0,
+      	weight: 1.5,
+      	color: "#000000"
+      },
+      onEachFeature: onEachTown
+
+      
+  });
+  var TownsWOLabeling = new L.geoJson(null, {
+    style: {
+      fillColor: "#000000",
+      fillOpacity: 0,
+      weight: 1.5,
+      color: "#000000"
+}
+  });
+
+  var nhbMarker = L.AwesomeMarkers.icon({
+    icon: 'leaf',
+    markerColor: 'green',
+    prefix: 'fa',
+    iconColor: 'black'
+  });
+
+  map.spin(true);  // on
+
+  function addData(data, layer) {
+	layer.addData(data);
+    map.spin(false);
+}
+
+  Towns.addTo(map);
+  $.getJSON("https://rawgit.com/derekserach/NHBDataMapper/master/geojson/Towns.geojson", function(data) { addData(data, Towns); addData(data, TownsWOLabeling);});
+  
+  //$.getJSON('Towns.geojson', function(data){
+    //Towns.addData(data);
+    //TownsWOLabeling.addData(data)
+  //});
+
+
+  map.on('zoomend', function(e){
+    if(e.target.getZoom() > 11){
+      map.removeLayer(Towns);
+      map.addLayer(TownsWOLabeling);
+    } else {
+      map.removeLayer(TownsWOLabeling);
+      map.addLayer(Towns);
+    }
+  
+  });
+  
+    
+  var searchControl = new L.Control.Search({layer: Towns, propertyName: 'NAME', circleLocation:false});
+
+	searchControl.on('search_locationfound', function(e) {
+
+        map.fitBounds(e.layer.getBounds());
+
+		e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
+
+	}).on('search_collapsed', function(e) {
+
+		featuresLayer.eachLayer(function(layer) {	//restore feature color
+			featuresLayer.resetStyle(layer);
+		});	
+	});
+
+	map.addControl( searchControl );  //inizialize search control
+    new L.Control.GeoSearch({
+    provider: new L.GeoSearch.Provider.Esri()
+}).addTo(map);
+
+    var options = {timeout: 30000, position: 'bottomright' }
+    var box = L.control.messagebox(options).addTo(map);
+    //leaflet draw mechanics
+    var counterPoint = 0;
+    var counterPoly = 0;
+    var boxstring = '<u>Features Drawn:</u> <br>';
+    var fgPoint = L.featureGroup();
+    var fgPoly = L.featureGroup();
+    var featureGroup = L.featureGroup().addTo(map);
+
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: featureGroup,
+                remove: false
+            }, 
+            draw: {
+            	circle: false,
+            	polyline: false,
+            	rectangle:false,
+            	marker: false,
+            	//marker: {
+            		//repeatMode: true,
+                //icon: nhbMarker,
+            	//},
+            	polygon: {
+     				shapeOptions: {
+      					color: 'purple'
+     				},
+     				allowIntersection: false,
+     				drawError: {
+      					color: 'orange',
+      					timeout: 1000
+     				},
+     				showArea: true,
+     				metric: false
+   					 }
+            }
+        }).addTo(map);
+
+        map.on('draw:created', function(e) {
+
+            // Each time a feaute is created, it's added to the over arching feature group
+            featureGroup.addLayer(e.layer);
+            DrawBool = true;
+            DeleteFeatures.enable();
+            
+            counterPoly ++;
+            poly = e.layer.toGeoJSON();
+            var area = turf.area(poly) * 0.0002471054;
+            boxstring = boxstring + 'Polygon ' + counterPoly + ': ' + area.toFixed(2) + ' acres. <br>';
+            e.layer.bindPopup('Polygon: ' + counterPoly);
+            fgPoly.addLayer(e.layer);
+            
+            box.show(boxstring);
+        });
+
+    var ResetMap = L.easyButton( {
+    	states:[{
+    		stateName: 'ResetMap',
+    		icon: 'fa-home fa-2x',
+    		title: 'Reset Map', 
+    		onClick: function(control){
+        		sidebar.open('home');
+    	        map.setView(new L.LatLng(44, -72.5), 8);
+        	}
+        }]
+    });
+    
+    var DeleteFeatures = L.easyButton( {
+    	states:[{
+    		stateName: 'DeleteFeatures',
+    		icon: 'fa-trash-o fa-2x',
+    		title: 'Delete Features', 
+    		onClick: function(control){
+        		featureGroup.clearLayers();
+        		DrawBool = false;
+        		DeleteFeatures.disable();
+            counterPoint = 0;
+            counterPoly = 0;
+            boxstring = '<u>Features Drawn:</u> <br>';
+        		}
+        		
+        	
+        }]
+    });
+    var infoPanel = L.easyButton( {
+    	states:[{
+    		stateName: 'infoPanel',
+    		icon: '<span>&equiv;</span>',
+    		title: 'Toggle Info Panel', 
+    		onClick: function(control){
+        		sidebar.toggle();
+        	}
+        }]
+    });
+    DeleteFeatures.addTo(map);
+    DeleteFeatures.disable();
+    ResetMap.addTo(map);
+
+
+
+   //adding highlight functions
+   function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        color: '#ffa500',
+        dashArray: '',
+        fillOpacity: 0
+    });
+    
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+}
+function resetHighlight(e) {
+    Towns.resetStyle(e.target);
+}
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+    
+}
+function onEachTown(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+    });
+    layer.bindLabel(feature.properties.NAME, {className: "my-label"});
+    
+    
+}
+var scale = L.control.scale().addTo(map);
+L.control.mousePosition().addTo(map);
+var sidebar = L.control.sidebar('sidebar', {
+    position: 'left'
+});
+
+map.addControl(sidebar);
+sidebar.open('home');
+
+
+var msgOne = '<form role="form" onsubmit="return NextPage()">\
+			<div class="form-group">\
+        		<label for="loname" class="control-label">Landowner Name:</label>\
+        		<input type="text" class="form-control" id="loname" required>\
+        	</div>\
+        	<div class="form-group">\
+        		<label for="loaddress" class="control-label">Mailing Address:</label>\
+        		<input type="text" class="form-control" id="loaddress" required>\
+        	</div>\
+        	<div class="form-group">\
+        		<label for="lotown" class="control-label">Town:</label>\
+        		<input type="text" class="form-control" id="lotown" required>\
+        	</div>\
+        	<div class="form-group">\
+        		<label for="lostate" class="control-label">State:</label>\
+        		<select class="form-control" id="lostate">\
+					<option value="">N/A</option>\
+					<option value="AK">Alaska</option>\
+					<option value="AL">Alabama</option>\
+					<option value="AR">Arkansas</option>\
+					<option value="AZ">Arizona</option>\
+					<option value="CA">California</option>\
+					<option value="CO">Colorado</option>\
+					<option value="CT">Connecticut</option>\
+					<option value="DC">District of Columbia</option>\
+					<option value="DE">Delaware</option>\
+					<option value="FL">Florida</option>\
+					<option value="GA">Georgia</option>\
+					<option value="HI">Hawaii</option>\
+					<option value="IA">Iowa</option>\
+					<option value="ID">Idaho</option>\
+					<option value="IL">Illinois</option>\
+					<option value="IN">Indiana</option>\
+					<option value="KS">Kansas</option>\
+					<option value="KY">Kentucky</option>\
+					<option value="LA">Louisiana</option>\
+					<option value="MA">Massachusetts</option>\
+					<option value="MD">Maryland</option>\
+					<option value="ME">Maine</option>\
+					<option value="MI">Michigan</option>\
+					<option value="MN">Minnesota</option>\
+					<option value="MO">Missouri</option>\
+					<option value="MS">Mississippi</option>\
+					<option value="MT">Montana</option>\
+					<option value="NC">North Carolina</option>\
+					<option value="ND">North Dakota</option>\
+					<option value="NE">Nebraska</option>\
+					<option value="NH">New Hampshire</option>\
+					<option value="NJ">New Jersey</option>\
+					<option value="NM">New Mexico</option>\
+					<option value="NV">Nevada</option>\
+					<option value="NY">New York</option>\
+					<option value="OH">Ohio</option>\
+					<option value="OK">Oklahoma</option>\
+					<option value="OR">Oregon</option>\
+					<option value="PA">Pennsylvania</option>\
+					<option value="PR">Puerto Rico</option>\
+					<option value="RI">Rhode Island</option>\
+					<option value="SC">South Carolina</option>\
+					<option value="SD">South Dakota</option>\
+					<option value="TN">Tennessee</option>\
+					<option value="TX">Texas</option>\
+					<option value="UT">Utah</option>\
+					<option value="VA">Virginia</option>\
+					<option value="VT">Vermont</option>\
+					<option value="WA">Washington</option>\
+					<option value="WI">Wisconsin</option>\
+					<option value="WV">West Virginia</option>\
+					<option value="WY">Wyoming</option>\
+				</select>\
+        	</div>\
+        	<div class="form-group">\
+        		<label for="lozip" class="control-label">Zip Code:</label>\
+        		<input class="form-control" id="lozip" maxlength="5" minlength="5" type="text" required>\
+        	</div>\
+        	<div class="form-group">\
+        		<label for="lophone" class="control-label">Phone Number:</label>\
+        		<input class="form-control" id="lophone" maxlength="10" minlength="10" type="text" required>\
+        	</div>\
+        	<p>Include area code. No "1" before or dashes please!</p>\
+        	<div class="form-group">\
+        		<label for="loemail" class="control-label">Email Address:</label>\
+        		<input type="email" class="form-control" id="loemail" required>\
+        	</div>\
+        	<div class="form-group">\
+        	<div class="checkbox">\
+        		<label><input type="checkbox" id="sameinfo">Check if Requestor Information is the same as Landowner</label>\
+        	</div>\
+        	</div>\
+        	<div class="form-group">\
+        		<button type="submit" class="btn btn-primary">Confirm</button>\
+        	</div>\
+        </form>'
+
+var msgTwo = '<form role="form" onsubmit="return NextPage2()">\
+				<div class="form-group">\
+					<label for="requestname" class="control-label">Requested By - Name:</label>\
+					<input type="text" class="form-control" id="requestname" required>\
+				</div>\
+				<div class="form-group">\
+					<label for="requestorg" class="control-label">Organization:</label>\
+					<input type="text" class="form-control" id="requestorg" required>\
+				</div>\
+				<div class="form-group">\
+					<label for="requestaddress" class="control-label">Mailing Address:</label>\
+					<input type="text" class="form-control" id="requestaddress" required>\
+				</div>\
+				<div class="form-group">\
+					<label for="requesttown" class="control-label" required>Town:</label>\
+					<input type="text" class="form-control" id="requesttown" required>\
+				</div>\
+				<div class="form-group">\
+        		<label for="requeststate" class="control-label">State:</label>\
+        		<select class="form-control" id="requeststate">\
+					<option value="">N/A</option>\
+					<option value="AK">Alaska</option>\
+					<option value="AL">Alabama</option>\
+					<option value="AR">Arkansas</option>\
+					<option value="AZ">Arizona</option>\
+					<option value="CA">California</option>\
+					<option value="CO">Colorado</option>\
+					<option value="CT">Connecticut</option>\
+					<option value="DC">District of Columbia</option>\
+					<option value="DE">Delaware</option>\
+					<option value="FL">Florida</option>\
+					<option value="GA">Georgia</option>\
+					<option value="HI">Hawaii</option>\
+					<option value="IA">Iowa</option>\
+					<option value="ID">Idaho</option>\
+					<option value="IL">Illinois</option>\
+					<option value="IN">Indiana</option>\
+					<option value="KS">Kansas</option>\
+					<option value="KY">Kentucky</option>\
+					<option value="LA">Louisiana</option>\
+					<option value="MA">Massachusetts</option>\
+					<option value="MD">Maryland</option>\
+					<option value="ME">Maine</option>\
+					<option value="MI">Michigan</option>\
+					<option value="MN">Minnesota</option>\
+					<option value="MO">Missouri</option>\
+					<option value="MS">Mississippi</option>\
+					<option value="MT">Montana</option>\
+					<option value="NC">North Carolina</option>\
+					<option value="ND">North Dakota</option>\
+					<option value="NE">Nebraska</option>\
+					<option value="NH">New Hampshire</option>\
+					<option value="NJ">New Jersey</option>\
+					<option value="NM">New Mexico</option>\
+					<option value="NV">Nevada</option>\
+					<option value="NY">New York</option>\
+					<option value="OH">Ohio</option>\
+					<option value="OK">Oklahoma</option>\
+					<option value="OR">Oregon</option>\
+					<option value="PA">Pennsylvania</option>\
+					<option value="PR">Puerto Rico</option>\
+					<option value="RI">Rhode Island</option>\
+					<option value="SC">South Carolina</option>\
+					<option value="SD">South Dakota</option>\
+					<option value="TN">Tennessee</option>\
+					<option value="TX">Texas</option>\
+					<option value="UT">Utah</option>\
+					<option value="VA">Virginia</option>\
+					<option value="VT">Vermont</option>\
+					<option value="WA">Washington</option>\
+					<option value="WI">Wisconsin</option>\
+					<option value="WV">West Virginia</option>\
+					<option value="WY">Wyoming</option>\
+				</select>\
+        	</div>\
+				<div class="form-group">\
+					<label for="requestzip" class="control-label">Zip Code:</label>\
+					<input class="form-control" id="requestzip" type="text" maxlength="5" minlength="5" required>\
+				</div>\
+				<div class="form-group">\
+					<label for="requestphone" class="control-label">Phone Number:</label>\
+					<input class="form-control" id="requestphone" type="text" maxlength="10" minlength="10" required>\
+				</div>\
+				<p>Include area code. No "1" before or dashes please!</p>\
+				<div class="form-group">\
+					<label for="requestemail" class="control-label">Email Address:</label>\
+					<input type="email" class="form-control" id="requestemail" required></div>\
+				<div class="form-group">\
+					<button type="submit" class="btn btn-primary">Confirm</button>\
+				</div>\
+			</form>'
+
+var MsgThree = '<form role="form" onsubmit="return LastPage()">\
+					<div class="form-group">\
+						<label for="proptown" class="control-label">Town - Location of the Property:</label>\
+						<input type="text" class="form-control" id="proptown" required>\
+					</div>\
+					<div class="form-group">\
+						<label for="taxmap" class="control-label">Tax Map and Lot:</label>\
+						<input type="text" class="form-control" id="taxmap" required>\
+					</div>\
+					<div class="form-group">\
+						<button type="submit" class="btn btn-primary">Confirm</button>\
+					</div>\
+				</form>'
+
+var Page1 = new BootstrapDialog({
+        	title: 'Landowner Request Form - Landowner Information',
+        	message: msgOne
+        });
+
+var Page2 = new BootstrapDialog({
+        	title: 'Landowner Request Form - Requested By Information',
+        	message: msgTwo
+        });
+
+var Page3 = new BootstrapDialog({
+	title: 'Landowner Request Form - Location Information',
+	message: MsgThree
+});
+
+var Page4 = new BootstrapDialog({
+	title: 'Download Form to attach to Email',
+	message: '<a href="#" id="dl" class="btn btn-primary" onclick="dlFeatures()">Download Form!</a>'
+});
+
+var dataset1 = null;
+var dataset2 = null;
+var dataset3 = null;
+var checkBool = false;
+
+function GetPage1(){
+	var loname = document.getElementById('loname').value;
+	var loaddress = document.getElementById('loaddress').value;
+	var lotown = document.getElementById('lotown').value;
+	var lostate = document.getElementById('lostate').value;
+	var lozip = document.getElementById('lozip').value;
+	var lophone = document.getElementById('lophone').value;
+	var loemail = document.getElementById('loemail').value;
+	var Page1Data = "," + loname + "," + loaddress + "," + lotown + "," + lostate + "," + lozip + "," + lophone + "," + loemail;
+	return Page1Data;
+}
+function GetPage2() {
+	var requestname = document.getElementById('requestname').value;
+	var requestorg = document.getElementById('requestorg').value;
+	var requestaddress = document.getElementById('requestaddress').value;
+	var requesttown = document.getElementById('requesttown').value;
+	var requeststate = document.getElementById('requeststate').value;
+	var requestzip = document.getElementById('requestzip').value;
+	var requestphone = document.getElementById('requestphone').value;
+	var requestemail = document.getElementById('requestemail').value;
+	var Page2Data = "," + requestname + "," + requestorg + "," + requestaddress + "," + requesttown + "," + requeststate + "," + requestzip + "," + requestphone + "," + requestemail;
+	return Page2Data;
+}
+
+function GetPage2Empty() {
+	Page2null = ",,,,,,,,";
+	return Page2null;
+}
+function GetPage3() {
+	var proptown = document.getElementById('proptown').value;
+	var taxmap = document.getElementById('taxmap').value;
+	var Page3Data = "," + proptown + "," + taxmap;
+	return Page3Data;
+}
+
+function checkPage() {
+	if(document.getElementById('sameinfo').checked) {
+    			checkBool = true;
+			} else {
+    			checkBool = false;
+			}
+}
+
+function NextPage(){
+	if(document.getElementById('sameinfo').checked) {
+		dataset1 = GetPage1();
+		dataset2 = GetPage2Empty();
+		checkPage();
+		Page3.open();
+		Page1.close();
+} else {
+	dataset1 = GetPage1();
+	Page2.open();
+	Page1.close();
+    
+}
+return false;
+}
+
+
+
+function NextPage2(){
+	dataset2 = GetPage2();
+	Page2.close();
+	Page3.open();
+	return false;
+}
+
+function LastPage(){
+	dataset3 = GetPage3();
+	Page3.close();
+	Page4.open();
+	return false;
+}
+
+function dlFeatures(){
+	if(DrawBool == true){
+			var data = featureGroup.toGeoJSON();
+            var convertedData = encodeURIComponent(JSON.stringify(data));
+            if(checkBool == true) {
+    			document.getElementById('dl').setAttribute('href', 'data:' + dataset1 + dataset2 + dataset3+ "," + convertedData);
+			} else {
+    			document.getElementById('dl').setAttribute('href', 'data:' + dataset1 + dataset2 + dataset3 + "," + convertedData);
+			}
+	}else {
+		if(checkBool == true) {
+    			document.getElementById('dl').setAttribute('href', 'data:' + dataset1 + dataset2 + dataset3);
+			} else {
+    			document.getElementById('dl').setAttribute('href', 'data:' + dataset1 + dataset2 + dataset3);
+			}
+		}
+            
+    document.getElementById('dl').setAttribute('download','NHB_LORequest.csv');
+    BootstrapDialog.closeAll();
+    sidebar.open('home');
+}
+
+document.getElementById('export').onclick = function(e) {
+      if(DrawBool == true){
+           Page1.open();
+           sidebar.close();
+           
+            
+
+            
+            
+          
+        } else if (DrawBool == false){
+          //document.getElementById('export').setAttribute('href', '#');
+          //document.getElementById('export').removeAttribute('download');
+          BootstrapDialog.show({
+            title: 'No Spatial Data Warning',
+            message: 'No Spatial Data present to include in form, if you are using this application for just the form, please attach additional information in your e-mail (jpgs, pdfs, shapefiles etc.)',
+            type: BootstrapDialog.TYPE_WARNING,
+            size: BootstrapDialog.SIZE_SMALL,
+            buttons: [{
+            	label: 'Proceed to Landowner Request Form',
+            	cssClass: 'btn-primary',
+            	action: function (dialogItself){
+            		Page1.open();
+            		dialogItself.close();
+            		sidebar.close();
+            	}
+            }]
+            });
+        }
+    }
+
+
+  </script>
+</body>
+</html>
